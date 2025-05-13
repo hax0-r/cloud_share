@@ -1,103 +1,166 @@
-import Image from "next/image";
+//   API environment variable
+// CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@deo5ex1zo
+
+
+// API Key
+// 812315141563513
+
+// API Secret
+// NqxjOcXN2jGixdMXz2L7ZVG3wzI
+"use client"
+
+import { db } from "@/libs/firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const formHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name || !email || !file) {
+      toast.error("All fields including file upload are required.");
+      return;
+    }
+
+    setLoading(true);
+
+    let uploadedFileUrl = "";
+
+    try {
+      // Upload to Cloudinary
+      const url = `https://api.cloudinary.com/v1_1/deo5ex1zo/upload`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "deo5ex1zo"); // 🔁 Make sure this matches your actual unsigned preset name
+
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.secure_url) {
+        uploadedFileUrl = data.secure_url;
+      } else {
+        throw new Error("Failed to upload file to Cloudinary.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("File upload failed.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Save to Firestore
+      await addDoc(collection(db, "data"), {
+        name,
+        email,
+        fileUrl: uploadedFileUrl,
+        createdAt: serverTimestamp(),
+      });
+
+      toast.success("Submitted successfully!");
+      setName("");
+      setEmail("");
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Manually reset the file input
+      }
+    } catch (error) {
+      console.error("Error saving to Firestore:", error);
+      toast.error("Submission failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  return (
+    <div className="">
+      <Link href={"/dashboard"} className="absolute top-10 right-10 hover:underline">Dashboard</Link>
+      <div className="max-w-5xl w-full mx-auto p-5">
+        <h1 className="text-4xl font-medium md:mt-20">Cloud Project</h1>
+
+        <form className="mt-16" onSubmit={formHandler}>
+          {/* Name Input */}
+          <label htmlFor="name" className="text-zinc-300">Name</label>
+          <input
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+            type="text"
+            className="w-full border border-zinc-700 p-3 rounded-lg mt-1"
+            placeholder="Enter Name"
+          />
+
+          {/* Email Input */}
+          <label htmlFor="email" className="text-zinc-300 block mt-8">Email</label>
+          <input
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            type="email"
+            id="email"
+            className="w-full border border-zinc-700 p-3 rounded-lg mt-1"
+            placeholder="Enter Email"
+          />
+
+          {/* File Upload */}
+          <label htmlFor="file" className="text-zinc-300 block mt-8">Upload File</label>
+
+          <label htmlFor="file"
+            className="text-zinc-300 font-semibold mt-1 text-base rounded w-full h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-zinc-700 border-dashed mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-11 mb-3 fill-gray-500" viewBox="0 0 32 32">
+              <path
+                d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z"
+                data-original="#000000" />
+              <path
+                d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z"
+                data-original="#000000" />
+            </svg>
+            Upload file
+            <input
+              onChange={(e) => {
+                const selected = e.target.files?.[0];
+                if (selected) setFile(selected);
+              }}
+              type="file"
+              id="file"
+              className="hidden"  // The input is still hidden but it's properly triggered
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <p className="text-xs font-medium text-zinc-200 mt-2">File size exceeds the 10MB limit.</p>
+          </label>
+
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full text-center mt-4 rounded-lg bg-zinc-200 cursor-pointer transition-all duration-500 hover:opacity-80 text-black flex items-center justify-center gap-2 p-3"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                Submitting...
+              </div>
+            ) : (
+              "Submit the Request"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
