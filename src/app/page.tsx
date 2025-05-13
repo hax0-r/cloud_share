@@ -1,12 +1,3 @@
-//   API environment variable
-// CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@deo5ex1zo
-
-
-// API Key
-// 812315141563513
-
-// API Secret
-// NqxjOcXN2jGixdMXz2L7ZVG3wzI
 "use client"
 
 import { db } from "@/libs/firebase";
@@ -27,7 +18,7 @@ export default function Home() {
     e.preventDefault();
 
     if (!name || !email || !file) {
-      toast.error("All fields including file upload are required.");
+      toast.error("All fields are required.");
       return;
     }
 
@@ -88,7 +79,7 @@ export default function Home() {
 
   return (
     <div className="">
-      <Link href={"/dashboard"} className="absolute top-10 right-10 hover:underline">Dashboard</Link>
+      <Link href={"/dashboard"} className="absolute top-10 left-10 hover:underline">Dashboard</Link>
       <div className="max-w-5xl w-full mx-auto p-5">
         <h1 className="text-4xl font-medium md:mt-20">Cloud Project</h1>
 
@@ -115,19 +106,33 @@ export default function Home() {
           />
 
           {/* File Upload */}
+          {/* File Upload */}
           <label htmlFor="file" className="text-zinc-300 block mt-8">Upload File</label>
 
-          <label htmlFor="file"
-            className="text-zinc-300 font-semibold mt-1 text-base rounded w-full h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-zinc-700 border-dashed mx-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-11 mb-3 fill-gray-500" viewBox="0 0 32 32">
-              <path
-                d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z"
-                data-original="#000000" />
-              <path
-                d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z"
-                data-original="#000000" />
-            </svg>
-            Upload file
+          <div
+            className={`relative mt-1 text-zinc-300 font-semibold text-base rounded w-full h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed ${file ? "border-green-600 bg-green-900/10" : "border-zinc-700"
+              } transition-all duration-300`}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {file ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-12 mb-2 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.708l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+                <p className="text-sm font-medium text-green-400">File Attached!</p>
+                <p className="text-xs mt-1 text-zinc-200">{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</p>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-11 mb-3 fill-gray-500" viewBox="0 0 32 32">
+                  <path d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z" />
+                  <path d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z" />
+                </svg>
+                <p>Click or drop to upload</p>
+                <p className="text-xs font-medium text-zinc-400 mt-1">Max file size 10MB.</p>
+              </>
+            )}
+
             <input
               onChange={(e) => {
                 const selected = e.target.files?.[0];
@@ -135,10 +140,11 @@ export default function Home() {
               }}
               type="file"
               id="file"
-              className="hidden"  // The input is still hidden but it's properly triggered
+              ref={fileInputRef}
+              className="hidden"
             />
-            <p className="text-xs font-medium text-zinc-200 mt-2">File size exceeds the 10MB limit.</p>
-          </label>
+          </div>
+
 
 
           {/* Submit Button */}

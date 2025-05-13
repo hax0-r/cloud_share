@@ -1,4 +1,5 @@
 "use client";
+import Loader from '@/components/Loader';
 import { db } from '@/libs/firebase';
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
@@ -11,7 +12,6 @@ import { toast } from 'react-toastify';
 interface Client {
   id: string;
   date: string;
-  userId: string;
   name: string;
   email: string;
   fileUrl: string;
@@ -59,13 +59,26 @@ const Page = () => {
     }
   };
 
+  // Utility function to determine the file type
+  const getFileType = (url: string) => {
+    const extension = url.split('.').pop()?.toLowerCase();
+    if (!extension) return 'unknown';
+
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) return 'image';
+    if (['mp4', 'webm', 'ogg'].includes(extension)) return 'video';
+    if (['zip', 'rar', '7z'].includes(extension)) return 'archive';
+
+    return 'other';
+  };
+
+
   if (loading) {
-    return <div>Loading...</div>; // You can customize the loading state
+    return <Loader />; // You can customize the loading state
   }
 
   return (
     <div>
-      <Link href={"/"} className="absolute top-10 right-10 hover:underline">Home</Link>
+      <Link href={"/"} className="absolute top-10 left-10 hover:underline">Home</Link>
       <div className="max-w-7xl mx-auto md:p-5 p-3 md:mt-16 mt-8">
         <div className="flex items-center justify-center md:mb-8 mb-5">
           <h2 className="text-center font-medium md:text-4xl text-2xl text-zinc-200">Dashboard</h2>
@@ -73,30 +86,81 @@ const Page = () => {
 
         <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
           {/* Loop through clientsData to render each client */}
-          {clientsData.map((data) => (
-            <div key={data.id} className="w-full md:p-7 p-4 border-zinc-300 border rounded-lg">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-zinc-300">Date: {data.createdAt?.toDate().toLocaleDateString()}</p>
-                <button onClick={() => handleDelete(data)} className="bg-zinc-100 p-2 text-red-500 rounded-full cursor-pointer hover:bg-red-500 hover:text-white transition-all duration-500">
-                  <GoTrash />
-                </button>
+          {clientsData.map((data) => {
+            const fileType = getFileType(data.fileUrl);
+
+            return (
+              <div key={data.id} className="w-full md:p-7 p-4 border-zinc-300 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-zinc-300">
+                    Date: {data.createdAt?.toDate().toLocaleDateString()}
+                  </p>
+                  <button
+                    onClick={() => handleDelete(data)}
+                    className="bg-zinc-100 p-2 text-red-500 rounded-full cursor-pointer hover:bg-red-500 hover:text-white transition-all duration-500"
+                  >
+                    <GoTrash />
+                  </button>
+                </div>
+
+                <p className="text-sm mt-5 text-zinc-300">
+                  Name:
+                  <span className="text-[16px] font-medium text-zinc-200 md:pl-1">{data.name}</span>
+                </p>
+
+                <Link href={`mailto:${data.email}`} className="text-sm text-zinc-300 block mt-5">
+                  E-Mail:
+                  <span className="text-[16px] font-medium text-zinc-200 md:pl-1 hover:underline">{data.email}</span>
+                </Link>
+
+                {/* Dynamic media rendering based on file type */}
+                <div className="mt-5 w-full text-center">
+                  {fileType === 'image' && (
+                    <Image
+                      src={data.fileUrl}
+                      alt="Uploaded Image"
+                      className="mx-auto w-auto h-80 rounded-lg"
+                      width={500}
+                      height={200}
+                    />
+                  )}
+
+                  {fileType === 'video' && (
+                    <video controls className="mx-auto w-full h-80 rounded-lg">
+                      <source src={data.fileUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+
+                  {fileType === 'archive' && (
+                    <a
+                      href={data.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-200 bg-zinc-700 p-4 mt-3 block rounded-lg w-full hover:underline"
+                    >
+                      📦 Download ZIP File
+                    </a>
+                  )}
+
+                  {fileType === 'other' && (
+                    <a
+                      href={data.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onError={(e) => {
+                        toast.error("File could not be found or loaded.");
+                      }}
+                      className="text-zinc-200 bg-zinc-700 p-4 mt-3 block rounded-lg w-full hover:underline"
+                    >
+                      📁 Open File
+                    </a>
+                  )}
+                </div>
               </div>
+            );
+          })}
 
-              <p className="text-sm text-zinc-300 mt-4">User ID:
-                <span className="text-[16px] font-medium text-zinc-200 md:pl-1">{data.userId}</span>
-              </p>
-              <p className="text-sm mt-5 text-zinc-300">Name:
-                <span className="text-[16px] font-medium text-zinc-200 md:pl-1">{data.name}</span>
-              </p>
-
-              <Link href={`mailto:${data.email}`} className="text-sm text-zinc-300 block mt-5">
-                E-Mail:
-                <span className="text-[16px] font-medium text-zinc-200 md:pl-1 hover:underline">{data.email}</span>
-              </Link>
-
-              <Image src={data.fileUrl} alt="User Image" className="mx-auto w-auto h-80 mt-5 rounded-lg" width={500} height={200} />
-            </div>
-          ))}
         </div>
       </div>
     </div>

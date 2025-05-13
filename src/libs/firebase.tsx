@@ -14,3 +14,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app)
+
+//   API environment variable
+// CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@deo5ex1zo
+
+
+// API Key
+// 812315141563513
+
+// API Secret
+// NqxjOcXN2jGixdMXz2L7ZVG3wzI
