@@ -149,7 +149,7 @@ const Page = () => {
                       href={data.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onError={(e) => {
+                      onError={() => {
                         toast.error("File could not be found or loaded.");
                       }}
                       className="text-zinc-200 bg-zinc-700 p-4 mt-3 block rounded-lg w-full hover:underline"
