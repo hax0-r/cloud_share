@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 
