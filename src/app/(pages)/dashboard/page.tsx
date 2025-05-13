@@ -13,7 +13,7 @@ interface Client {
   id: string;
   date: string;
   name: string;
-  email: string;
+  message: string;
   fileUrl: string;
   createdAt?: {
     toDate: () => Date;
@@ -108,10 +108,11 @@ const Page = () => {
                   <span className="text-[16px] font-medium text-zinc-200 md:pl-1">{data.name}</span>
                 </p>
 
-                <Link href={`mailto:${data.email}`} className="text-sm text-zinc-300 block mt-5">
-                  E-Mail:
-                  <span className="text-[16px] font-medium text-zinc-200 md:pl-1 hover:underline">{data.email}</span>
-                </Link>
+                <p className="text-sm text-zinc-300 block mt-5">
+                  Message
+                </p>
+                <textarea value={data.message}
+                  className="w-full border border-zinc-700 p-3 rounded-lg mt-2" readOnly placeholder="Message" rows={3} id="message" />
 
                 {/* Dynamic media rendering based on file type */}
                 <div className="mt-5 w-full text-center">

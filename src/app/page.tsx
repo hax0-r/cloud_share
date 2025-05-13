@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 export default function Home() {
   const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
 
@@ -17,7 +17,7 @@ export default function Home() {
   const formHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !email || !file) {
+    if (!name || !message || !file) {
       toast.error("All fields are required.");
       return;
     }
@@ -56,14 +56,14 @@ export default function Home() {
       // Save to Firestore
       await addDoc(collection(db, "data"), {
         name,
-        email,
+        message,
         fileUrl: uploadedFileUrl,
         createdAt: serverTimestamp(),
       });
 
       toast.success("Submitted successfully!");
       setName("");
-      setEmail("");
+      setMessage("");
       setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = ""; // Manually reset the file input
@@ -81,33 +81,21 @@ export default function Home() {
     <div className="">
       <Link href={"/dashboard"} className="absolute top-10 left-10 hover:underline">Dashboard</Link>
       <div className="max-w-5xl w-full mx-auto p-5">
-        <h1 className="text-4xl font-medium md:mt-20">Cloud Project</h1>
+        <h1 className="text-4xl font-medium md:mt-16 mt-10">Cloud Project</h1>
 
-        <form className="mt-16" onSubmit={formHandler}>
+        <form className="mt-12" onSubmit={formHandler}>
           {/* Name Input */}
           <label htmlFor="name" className="text-zinc-300">Name</label>
-          <input
-            onChange={(e) => setName(e.target.value)}
-            value={name}
-            type="text"
-            className="w-full border border-zinc-700 p-3 rounded-lg mt-1"
-            placeholder="Enter Name"
-          />
+          <input onChange={(e) => setName(e.target.value)}
+            value={name} className="w-full border border-zinc-700 p-3 rounded-lg mt-1" placeholder="Write your work" id="message" />
 
-          {/* Email Input */}
-          <label htmlFor="email" className="text-zinc-300 block mt-8">Email</label>
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            type="email"
-            id="email"
-            className="w-full border border-zinc-700 p-3 rounded-lg mt-1"
-            placeholder="Enter Email"
-          />
+          <label htmlFor="name" className="text-zinc-300 block mt-6">Message</label>
+          <textarea onChange={(e) => setMessage(e.target.value)}
+            value={message} className="w-full border border-zinc-700 p-3 rounded-lg mt-1" placeholder="Message" rows={3} id="message"></textarea>
 
+        
           {/* File Upload */}
-          {/* File Upload */}
-          <label htmlFor="file" className="text-zinc-300 block mt-8">Upload File</label>
+          <label htmlFor="file" className="text-zinc-300 block mt-6">Upload File</label>
 
           <div
             className={`relative mt-1 text-zinc-300 font-semibold text-base rounded w-full h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed ${file ? "border-green-600 bg-green-900/10" : "border-zinc-700"
