@@ -78,7 +78,7 @@ const Page = () => {
 
   return (
     <div>
-      <Link href={"/"} className="absolute top-10 left-10 hover:underline">Home</Link>
+      <Link href={"/"} className="absolute md:top-10 top-4 md:left-10 left-4 hover:underline">Home</Link>
       <div className="max-w-7xl mx-auto md:p-5 p-3 md:mt-16 mt-8">
         <div className="flex items-center justify-center md:mb-8 mb-5">
           <h2 className="text-center font-medium md:text-4xl text-2xl text-zinc-200">Dashboard</h2>

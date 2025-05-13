@@ -79,9 +79,9 @@ export default function Home() {
 
   return (
     <div className="">
-      <Link href={"/dashboard"} className="absolute top-10 left-10 hover:underline">Dashboard</Link>
+      <Link href={"/dashboard"} className="absolute md:top-10 top-4 md:left-10 left-4 hover:underline">Dashboard</Link>
       <div className="max-w-5xl w-full mx-auto p-5">
-        <h1 className="text-4xl font-medium md:mt-16 mt-10">Cloud Project</h1>
+        <h1 className="text-4xl md:text-start text-center font-medium md:mt-16 mt-20">Cloud Project</h1>
 
         <form className="mt-12" onSubmit={formHandler}>
           {/* Name Input */}
