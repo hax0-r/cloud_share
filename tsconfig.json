@@ -25,3 +25,7 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
+
+// text: `You are CloudShareBot, a helpful assistant for a cloud sharing application. Respond briefly (1–2 lines), clearly, and professionally. Help users with uploading files, sending messages, entering their name, and using the dashboard to view their uploads. Do not mention any technologies unless asked. Always guide the user on how to use the app's features. Users can use this platform without logging in, similar to airforshare.
+                        // If the user asks which technologies are used, respond with:
+                        // "We use Firebase for storing data, Cloudinary for image and file uploads, and the app is built with Next.js and TypeScript. We've also implemented Docker for deployment and scalability."`

@@ -5,6 +5,7 @@ import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { BiDownload } from 'react-icons/bi';
 import { GoTrash } from 'react-icons/go';
 import { toast } from 'react-toastify';
 
@@ -45,7 +46,7 @@ const Page = () => {
   }, []);
 
   const handleDelete = async (userData: { id: string, name: string }) => {
-    const confirmDelete = confirm("Are you sure you want to delete this client?");
+    const confirmDelete = confirm("Are you sure you want to delete this File?");
     if (!confirmDelete) return;
 
     try {
@@ -71,6 +72,30 @@ const Page = () => {
     return 'other';
   };
 
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Automatically get the filename from URL
+      const filename = url.split('/').pop()?.split('?')[0] || 'download';
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      // Clean up
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
+
 
   if (loading) {
     return <Loader />; // You can customize the loading state
@@ -95,12 +120,21 @@ const Page = () => {
                   <p className="text-sm text-zinc-300">
                     Date: {data.createdAt?.toDate().toLocaleDateString()}
                   </p>
-                  <button
-                    onClick={() => handleDelete(data)}
-                    className="bg-zinc-100 p-2 text-red-500 rounded-full cursor-pointer hover:bg-red-500 hover:text-white transition-all duration-500"
-                  >
-                    <GoTrash />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleDownload(data.fileUrl)}
+                      className="bg-zinc-100 p-1.5 text-blue-600 rounded-full cursor-pointer hover:bg-blue-600 hover:text-white transition-all duration-500"
+                    >
+                      <BiDownload size={20} />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(data)}
+                      className="bg-zinc-100 p-2 text-red-500 rounded-full cursor-pointer hover:bg-red-500 hover:text-white transition-all duration-500"
+                    >
+                      <GoTrash />
+                    </button>
+                  </div>
                 </div>
 
                 <p className="text-sm mt-5 text-zinc-300">
