@@ -66,13 +66,13 @@ const Chatbot: React.FC = () => {
         appendMessage('You', userMessage);
         setInput('');
 
-        const lowercaseMessage = userMessage.toLowerCase();
-        const greetings = ['hi', 'hello', 'hey', 'salam', 'assalamualaikum'];
-        const techQuestions = [
-            'what language is used behind this project',
-            'which technologies are used',
-            'what is the tech stack'
-        ];
+        // const lowercaseMessage = userMessage.toLowerCase();
+        // const greetings = ['hi', 'hello', 'hey', 'salam', 'assalamualaikum'];
+        // const techQuestions = [
+        //     'what language is used behind this project',
+        //     'which technologies are used',
+        //     'what is the tech stack'
+        // ];
 
        
         // Call Gemini for all other queries
